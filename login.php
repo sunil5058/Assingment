@@ -11,9 +11,12 @@ if(isset($_POST['submit'])){
         echo "Error: ". mysqli_error($conn);
     }else{
         if($result->num_rows > 0){
-           echo "Login successful!";
-        }else{
-            echo "Invalid email or password.";
+            $row= mysqli_fetch_assoc($result);
+
+            $_SESSION['user_id'] = $row['id'];
+            $_SESSION['user_name'] = $row['name'];
+            $_SESSION['user_role'] = $row['role'];
+           echo "Login successful! <a href='dashboard.php'>Go to Dashboard</a> ";
         }
     }
 }
