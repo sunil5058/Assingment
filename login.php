@@ -1,0 +1,39 @@
+<?php
+session_start();
+include 'db.php';
+if(isset($_POST['submit'])){
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    $sql = "SELECT * FROM users WHERE email='$email' AND password='$password'";
+    $result = mysqli_query($conn, $sql);
+    if(!$result){
+        echo "Error: ". mysqli_error($conn);
+    }else{
+        if($result->num_rows > 0){
+           echo "Login successful!";
+        }else{
+            echo "Invalid email or password.";
+        }
+    }
+}
+
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="login.php" method="POST">
+        Email: <input type="email" name="email" required><br>
+        Password: <input type="password" name="password" required><br>
+        <input type="submit" name="submit" value="Login"> 
+    </form>
+    
+</body>
+</html>
