@@ -1,49 +1,29 @@
 <?php
 session_start();
-include "db.php";
+include 'db.php';
 
-if (isset($_POST['submit'])) {
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+if(isset($_POST['login'])){
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
 
-    $sql = "SELECT * FROM users WHERE email = :email";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([':email' => $email]);
+    $sql = "SELECT * FROM users WHERE email='$email' AND password='$password'";
+    $result = mysqli_query($conn, $sql);
 
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($user && password_verify($password, $user['password'])) {
-
-        $_SESSION['user_id']   = $user['id'];
+    if(mysqli_num_rows($result) > 0){
+        $user = mysqli_fetch_assoc($result);
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_role'] = $user['user_role']; // 'admin' or 'user'
         $_SESSION['user_name'] = $user['name'];
-        $_SESSION['user_role'] = $user['role'];
 
-        header("Location: dashboard.php");
+        // Redirect based on role
+        if($user['user_role'] == 'admin'){
+            header("Location: admin_dashboard.php");
+        } else {
+            header("Location: dashboard.php");
+        }
         exit();
     } else {
-        $error = "Invalid email or password";
+        echo "Invalid login!";
     }
 }
 ?>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
-<body>
-
-<h2>Login</h2>
-
-<?php if (isset($error)) echo "<p style='color:red;'>$error</p>"; ?>
-
-<form method="POST">
-    Email: <input type="email" name="email" required><br><br>
-    Password: <input type="password" name="password" required><br><br>
-    <input type="submit" name="submit" value="Login">
-</form>
-
-<p>No account? <a href="register.php">Register</a></p>
-
-</body>
-</html>
