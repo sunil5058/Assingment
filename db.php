@@ -1,6 +1,6 @@
 <?php
 $host = "localhost";
-$dbname = "blogpostdb";
+$dbname = "cms_db";
 $user = "root";
 $password = "";
 

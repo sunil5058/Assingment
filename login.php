@@ -3,19 +3,18 @@ session_start();
 include 'db.php';
 
 if(isset($_POST['login'])){
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-    $sql = "SELECT * FROM users WHERE email='$email' AND password='$password'";
-    $result = mysqli_query($conn, $sql);
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email AND password = :password");
+    $stmt->execute(['email'=>$email, 'password'=>$password]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if(mysqli_num_rows($result) > 0){
-        $user = mysqli_fetch_assoc($result);
+    if($user){
         $_SESSION['user_id'] = $user['id'];
-        $_SESSION['user_role'] = $user['user_role']; // 'admin' or 'user'
+        $_SESSION['user_role'] = $user['user_role'];
         $_SESSION['user_name'] = $user['name'];
 
-        // Redirect based on role
         if($user['user_role'] == 'admin'){
             header("Location: admin_dashboard.php");
         } else {
@@ -27,3 +26,11 @@ if(isset($_POST['login'])){
     }
 }
 ?>
+
+<h2>Login</h2>
+<form method="POST">
+    <input type="email" name="email" placeholder="Email" required><br>
+    <input type="password" name="password" placeholder="Password" required><br>
+    <button type="submit" name="login">Login</button>
+</form>
+<a href="register.php">Register</a>

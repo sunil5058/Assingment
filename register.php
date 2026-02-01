@@ -1,48 +1,35 @@
 <?php
-include "db.php";
+session_start();
+include 'db.php';
 
-if (isset($_POST['submit'])) {
-    $name  = $_POST['name'];
+if(isset($_POST['register'])){
+    $name = $_POST['name'];
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // hash password
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-    $role = 'user';
-
-    $sql = "INSERT INTO users (name, email, password, role)
-            VALUES (:name, :email, :password, :role)";
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([
-        ':name'     => $name,
-        ':email'    => $email,
-        ':password' => $hashedPassword,
-        ':role'     => $role
-    ]);
-
-    header("Location: login.php");
-    exit();
+    // Check if email exists
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+    $stmt->execute(['email' => $email]);
+    if($stmt->rowCount() > 0){
+        echo "Email already registered!";
+    } else {
+        // Insert user
+        $stmt = $pdo->prepare("INSERT INTO users (name, email, password) VALUES (:name, :email, :password)");
+        $stmt->execute([
+            'name' => $name,
+            'email' => $email,
+            'password' => $password // For production: use password_hash($password, PASSWORD_DEFAULT)
+        ]);
+        echo "Registration successful! <a href='login.php'>Login here</a>";
+    }
 }
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Register</title>
-</head>
-<body>
-
 <h2>Register</h2>
-
 <form method="POST">
-    Name: <input type="text" name="name" required><br><br>
-    Email: <input type="email" name="email" required><br><br>
-    Password: <input type="password" name="password" required><br><br>
-    <input type="submit" name="submit" value="Register">
+    <input type="text" name="name" placeholder="Full Name" required><br>
+    <input type="email" name="email" placeholder="Email" required><br>
+    <input type="password" name="password" placeholder="Password" required><br>
+    <button type="submit" name="register">Register</button>
 </form>
-
-<p>Already have an account? <a href="login.php">Login</a></p>
-
-</body>
-</html>
+<a href="login.php">Login</a>
