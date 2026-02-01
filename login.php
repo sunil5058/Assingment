@@ -1,42 +1,49 @@
 <?php
 session_start();
-include 'db.php';
-if(isset($_POST['submit'])){
+include "db.php";
+
+if (isset($_POST['submit'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM users WHERE email='$email' AND password='$password'";
-    $result = mysqli_query($conn, $sql);
-    if(!$result){
-        echo "Error: ". mysqli_error($conn);
-    }else{
-        if($result->num_rows > 0){
-            $row= mysqli_fetch_assoc($result);
+    $sql = "SELECT * FROM users WHERE email = :email";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':email' => $email]);
 
-            $_SESSION['user_id'] = $row['id'];
-            $_SESSION['user_name'] = $row['name'];
-            $_SESSION['user_role'] = $row['role'];
-           echo "Login successful! <a href='dashboard.php'>Go to Dashboard</a> ";
-        }
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($user && password_verify($password, $user['password'])) {
+
+        $_SESSION['user_id']   = $user['id'];
+        $_SESSION['user_name'] = $user['name'];
+        $_SESSION['user_role'] = $user['role'];
+
+        header("Location: dashboard.php");
+        exit();
+    } else {
+        $error = "Invalid email or password";
     }
 }
-
 ?>
 
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login</title>
 </head>
 <body>
-    <form action="login.php" method="POST">
-        Email: <input type="email" name="email" required><br>
-        Password: <input type="password" name="password" required><br>
-        <input type="submit" name="submit" value="Login"> 
-    </form>
-    
+
+<h2>Login</h2>
+
+<?php if (isset($error)) echo "<p style='color:red;'>$error</p>"; ?>
+
+<form method="POST">
+    Email: <input type="email" name="email" required><br><br>
+    Password: <input type="password" name="password" required><br><br>
+    <input type="submit" name="submit" value="Login">
+</form>
+
+<p>No account? <a href="register.php">Register</a></p>
+
 </body>
 </html>
