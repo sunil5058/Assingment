@@ -1,0 +1,51 @@
+body {
+  font-family: Arial;
+  background: #fafafa;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+nav {
+  background: linear-gradient(
+    45deg,
+    #f09433,
+    #e6683c,
+    #dc2743,
+    #cc2366,
+    #bc1888
+  );
+  padding: 10px;
+}
+nav a {
+  color: white;
+  text-decoration: none;
+  margin-right: 15px;
+  font-weight: bold;
+}
+.post-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin: 10px 0;
+  background: white;
+  border-radius: 5px;
+}
+.post-card h3 {
+  color: #bc1888;
+}
+button {
+  background: #bc1888;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+input,
+textarea {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+}
+.error {
+  color: red;
+}
